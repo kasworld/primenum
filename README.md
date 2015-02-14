@@ -1,2 +1,2 @@
 # primenum
-golang prime generation
+golang prime number generation
