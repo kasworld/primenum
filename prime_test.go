@@ -1,4 +1,4 @@
-// Copyright 2015 SeukWon Kang (kasworld@gmail.com)
+// Copyright 2015,2016,2017,2018,2019 SeukWon Kang (kasworld@gmail.com)
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,7 +16,7 @@ import (
 )
 
 func TestMakePrime(t *testing.T) {
-	primes := MakePrimes(0xffff)
+	primes := MakePrimes(0xfffff)
 	t.Logf("%v", len(primes))
 	t.Logf("%v", primes[len(primes)-50:])
 }
