@@ -9,14 +9,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package primenum
+package main
 
 import (
-	"testing"
+	"fmt"
+	"time"
+
+	"github.com/kasworld/primenum"
 )
 
-func TestMakePrime(t *testing.T) {
-	primes := MakePrimes(0xfffff)
-	t.Logf("%v", len(primes))
-	t.Logf("%v", primes[len(primes)-50:])
+func main() {
+	for i := int64(8); i < 0xffffffff; i <<= 1 {
+		find(i)
+	}
+}
+
+func find(n int64) {
+	st := time.Now()
+	primes := primenum.MakePrimes(n)
+	fmt.Printf("%v %v %v\n",
+		time.Now().Sub(st),
+		len(primes),
+		primes[len(primes)-1],
+	)
 }
