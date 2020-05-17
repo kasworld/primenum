@@ -27,6 +27,7 @@ func main() {
 
 func find2(pn *primenum.PrimeIntList, n int) {
 	st := time.Now()
+	// pn.MultiAppendFindTo(n)
 	pn.AppendFindTo(n)
 	fmt.Printf("%v %v %v\n",
 		time.Now().Sub(st),

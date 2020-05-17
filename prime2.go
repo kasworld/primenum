@@ -14,6 +14,7 @@ package primenum
 import (
 	"math"
 	"sort"
+	"sync"
 )
 
 type PrimeIntList []int
@@ -78,4 +79,35 @@ func NewPrimeIntList(n int) PrimeIntList {
 	pn = append(pn, []int{2, 3}...)
 	pn.AppendFindTo(n)
 	return pn
+}
+
+func (pn *PrimeIntList) MultiAppendFindTo(n int) {
+	last := (*pn)[len(*pn)-1]
+	if last >= n {
+		return
+	}
+	if pn.MaxCanCheck() < n {
+		pn.AppendFindTo(n / 2)
+	}
+
+	appendCh := make(chan int)
+	go func() {
+		for n := range appendCh {
+			*pn = append(*pn, n)
+		}
+	}()
+
+	var wg sync.WaitGroup
+	for i := last + 2; i < n; i += 2 {
+		wg.Add(1)
+		go func(n int) {
+			defer wg.Done()
+			if pn.CalcPrime(n) {
+				appendCh <- n
+			}
+		}(i)
+	}
+	wg.Wait()
+	close(appendCh)
+	pn.Sort()
 }
