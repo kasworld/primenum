@@ -19,9 +19,20 @@ import (
 )
 
 func main() {
-	for i := int64(8); i < 0xffffffff; i <<= 1 {
-		find(i)
+	pn := primenum.NewPrimeIntList(8)
+	for i := int(8); i < 0xffffffff; i <<= 1 {
+		find2(&pn, i)
 	}
+}
+
+func find2(pn *primenum.PrimeIntList, n int) {
+	st := time.Now()
+	pn.AppendFindTo(n)
+	fmt.Printf("%v %v %v\n",
+		time.Now().Sub(st),
+		len(*pn),
+		(*pn)[len(*pn)-1],
+	)
 }
 
 func find(n int64) {
