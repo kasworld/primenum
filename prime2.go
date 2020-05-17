@@ -30,6 +30,12 @@ func (pn PrimeIntList) FindPos(n int) (int, bool) {
 	}
 }
 
+func (pn PrimeIntList) Sort() {
+	if !sort.IntsAreSorted(pn) {
+		sort.Ints(pn)
+	}
+}
+
 func (pn PrimeIntList) MaxCanCheck() int {
 	last := pn[len(pn)-1]
 	return last * last
@@ -56,6 +62,9 @@ func (pn *PrimeIntList) AppendFindTo(n int) {
 	last := (*pn)[len(*pn)-1]
 	if last >= n {
 		return
+	}
+	if pn.MaxCanCheck() < n {
+		pn.AppendFindTo(n / 2)
 	}
 	for i := last + 2; i < n; i += 2 {
 		if pn.CalcPrime(i) {
