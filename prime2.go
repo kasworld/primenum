@@ -13,6 +13,7 @@ package primenum
 
 import (
 	"math"
+	"runtime"
 	"sort"
 	"sync"
 )
@@ -90,24 +91,43 @@ func (pn *PrimeIntList) MultiAppendFindTo(n int) {
 		pn.AppendFindTo(n / 2)
 	}
 
-	appendCh := make(chan int)
+	bufl := runtime.NumCPU() * 2
+
+	var wgarg sync.WaitGroup
+	var wgresult sync.WaitGroup
+
+	// recv result
+	appendCh := make(chan int, bufl)
 	go func() {
 		for n := range appendCh {
 			*pn = append(*pn, n)
+			wgresult.Done()
 		}
 	}()
 
-	var wg sync.WaitGroup
+	// prepare need check data
+	argCh := make(chan int, (n-last-2)/2+1)
 	for i := last + 2; i < n; i += 2 {
-		wg.Add(1)
-		go func(n int) {
-			defer wg.Done()
-			if pn.CalcPrime(n) {
-				appendCh <- n
-			}
-		}(i)
+		argCh <- i
 	}
-	wg.Wait()
+	wgarg.Add(len(argCh))
+
+	// run worker
+	for i := 0; i < bufl; i++ {
+		go func() {
+			for n := range argCh {
+				if pn.CalcPrime(n) {
+					wgresult.Add(1)
+					appendCh <- n
+				}
+				wgarg.Done()
+			}
+		}()
+	}
+	wgarg.Wait()
+	wgresult.Wait()
+
 	close(appendCh)
+	close(argCh)
 	pn.Sort()
 }
