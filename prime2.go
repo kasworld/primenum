@@ -92,7 +92,7 @@ func (pn *PrimeIntList) MultiAppendFindTo(n int) {
 		pn.AppendFindTo(n / 2)
 	}
 
-	bufl := runtime.NumCPU() * 2
+	bufl := runtime.NumCPU() * 1
 
 	var wgWorker sync.WaitGroup
 	var wgAppend sync.WaitGroup
