@@ -19,7 +19,21 @@ import (
 )
 
 func main() {
-	main1()
+	// main1()
+	bench()
+}
+
+func bench() {
+	pn := primenum.NewPrimeIntList(8)
+	for i := int(8); i < 0xffffffffffff; i <<= 1 {
+		st := time.Now()
+		pn = pn.MultiAppendFindTo(i)
+		fmt.Printf("multi %v %v %v\n",
+			time.Now().Sub(st),
+			len(pn),
+			(pn)[len(pn)-1],
+		)
+	}
 }
 
 func main1() {
