@@ -181,6 +181,65 @@ func (pn PrimeIntList) MultiAppendFindTo2(n int) PrimeIntList {
 	return pn
 }
 
+func (pn PrimeIntList) MultiAppendFindTo3(n int) PrimeIntList {
+	lastIndex := len(pn) - 1
+	last := pn[lastIndex]
+	if last >= n {
+		return pn
+	}
+
+	if n >= last*last {
+		pn = pn.MultiAppendFindTo3(n / 2)
+		lastIndex = len(pn) - 1
+		last = pn[lastIndex]
+	}
+
+	workerCount := runtime.NumCPU() * 1
+
+	var wgWorker sync.WaitGroup
+
+	workResult := make([]PrimeIntList, workerCount)
+	// run worker
+	for workerID := 0; workerID < workerCount; workerID++ {
+		wgWorker.Add(1)
+		go func(workerID int) {
+			var rtn PrimeIntList
+			for i := last + 2 + workerID*2; i <= n; i += workerCount * 2 {
+				if pn.CalcPrime(i) {
+					rtn = append(rtn, i)
+				}
+			}
+			workResult[workerID] = rtn
+			wgWorker.Done()
+		}(workerID)
+	}
+	wgWorker.Wait()
+
+	// merge sort
+	workerPos := make([]int, workerCount)
+	for true {
+		minFound := 0
+		minWorkerID := 0
+		for workerID := 0; workerID < workerCount; workerID++ {
+			pos := workerPos[workerID]
+			if pos >= len(workResult[workerID]) {
+				continue
+			}
+			if minFound == 0 || workResult[workerID][pos] < minFound {
+				minFound = workResult[workerID][pos]
+				minWorkerID = workerID
+			}
+		}
+		if minFound != 0 {
+			pn = append(pn, minFound)
+			workerPos[minWorkerID]++
+		} else {
+			break
+		}
+	}
+	return pn
+}
+
 func (pn PrimeIntList) Save(filename string) error {
 	fd, err := os.Create(filename)
 	if err != nil {

@@ -57,15 +57,16 @@ func bench2() {
 func bench1() {
 	// for i := int(8); i < 0xff; i <<= 1 {
 	for i := int(8); i < 0xffffffffffff; i <<= 1 {
-		// find1(int64(i))
-		find2(i)
-		find3(i)
-		find4(i)
+		// simple(int64(i))
+		single(i)
+		// multi(i)
+		multi2(i)
+		multi3(i)
 		fmt.Println()
 	}
 }
 
-func find1(n int64) {
+func simple(n int64) {
 	st := time.Now()
 	pn := primenum.MakePrimes(n)
 	fmt.Printf("simple %v %v %v\n",
@@ -76,7 +77,7 @@ func find1(n int64) {
 	// fmt.Println(pn)
 }
 
-func find2(n int) {
+func single(n int) {
 	st := time.Now()
 	pn := primenum.NewPrimeIntList(8)
 	pn = pn.AppendFindTo(n)
@@ -88,7 +89,7 @@ func find2(n int) {
 	// fmt.Println(pn)
 }
 
-func find3(n int) {
+func multi(n int) {
 	st := time.Now()
 	pn := primenum.NewPrimeIntList(8)
 	pn = pn.MultiAppendFindTo(n)
@@ -100,11 +101,23 @@ func find3(n int) {
 	// fmt.Println(pn)
 }
 
-func find4(n int) {
+func multi2(n int) {
 	st := time.Now()
 	pn := primenum.NewPrimeIntList(8)
 	pn = pn.MultiAppendFindTo2(n)
 	fmt.Printf("multi2 %v %v %v\n",
+		time.Now().Sub(st),
+		len(pn),
+		(pn)[len(pn)-1],
+	)
+	// fmt.Println(pn)
+}
+
+func multi3(n int) {
+	st := time.Now()
+	pn := primenum.NewPrimeIntList(8)
+	pn = pn.MultiAppendFindTo3(n)
+	fmt.Printf("multi3 %v %v %v\n",
 		time.Now().Sub(st),
 		len(pn),
 		(pn)[len(pn)-1],
