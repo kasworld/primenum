@@ -94,41 +94,39 @@ func (pn *PrimeIntList) MultiAppendFindTo(n int) {
 
 	bufl := runtime.NumCPU() * 2
 
-	var wgarg sync.WaitGroup
-	var wgresult sync.WaitGroup
+	var wgWorker sync.WaitGroup
 
 	// recv result
 	appendCh := make(chan int, bufl)
 	go func() {
 		for n := range appendCh {
 			*pn = append(*pn, n)
-			wgresult.Done()
 		}
 	}()
 
 	// prepare need check data
-	argCh := make(chan int, (n-last-2)/2+1)
-	for i := last + 2; i < n; i += 2 {
-		argCh <- i
-	}
-	wgarg.Add(len(argCh))
+	argCh := make(chan int, bufl)
+	go func() {
+		for i := last + 2; i < n; i += 2 {
+			argCh <- i
+		}
+		close(argCh)
+	}()
 
 	// run worker
 	for i := 0; i < bufl; i++ {
+		wgWorker.Add(1)
 		go func() {
 			for n := range argCh {
 				if pn.CalcPrime(n) {
-					wgresult.Add(1)
 					appendCh <- n
 				}
-				wgarg.Done()
 			}
+			wgWorker.Done()
 		}()
 	}
-	wgarg.Wait()
-	wgresult.Wait()
-
+	wgWorker.Wait()
 	close(appendCh)
-	close(argCh)
+
 	sort.Ints((*pn)[lastIndex+1:])
 }
