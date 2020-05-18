@@ -23,9 +23,8 @@ import (
 
 type PrimeIntList []int
 
-func NewPrimeIntList(n int) PrimeIntList {
+func New() PrimeIntList {
 	pn := PrimeIntList{2, 3}
-	pn = pn.AppendFindTo(n)
 	return pn
 }
 

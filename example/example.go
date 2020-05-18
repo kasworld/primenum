@@ -19,14 +19,14 @@ import (
 )
 
 func main() {
-	bench1()
-	// bench2()
+	// bench1()
+	bench2()
 	// loadsave()
 }
 
 func loadsave() {
 	filename := "pnff.gob"
-	pn := primenum.NewPrimeIntList(0xff)
+	pn := primenum.New().AppendFindTo(0xff)
 	fmt.Println(pn)
 	err := pn.Save(filename)
 	if err != nil {
@@ -42,10 +42,10 @@ func loadsave() {
 }
 
 func bench2() {
-	pn := primenum.NewPrimeIntList(8)
+	pn := primenum.New()
 	for i := int(8); i < 0xffffffffffff; i <<= 1 {
 		st := time.Now()
-		pn = pn.MultiAppendFindTo(i)
+		pn = pn.MultiAppendFindTo3(i)
 		fmt.Printf("multi %v %v %v\n",
 			time.Now().Sub(st),
 			len(pn),
@@ -79,8 +79,7 @@ func simple(n int64) {
 
 func single(n int) {
 	st := time.Now()
-	pn := primenum.NewPrimeIntList(8)
-	pn = pn.AppendFindTo(n)
+	pn := primenum.New().AppendFindTo(n)
 	fmt.Printf("single %v %v %v\n",
 		time.Now().Sub(st),
 		len(pn),
@@ -91,8 +90,7 @@ func single(n int) {
 
 func multi(n int) {
 	st := time.Now()
-	pn := primenum.NewPrimeIntList(8)
-	pn = pn.MultiAppendFindTo(n)
+	pn := primenum.New().MultiAppendFindTo(n)
 	fmt.Printf("multi %v %v %v\n",
 		time.Now().Sub(st),
 		len(pn),
@@ -103,8 +101,7 @@ func multi(n int) {
 
 func multi2(n int) {
 	st := time.Now()
-	pn := primenum.NewPrimeIntList(8)
-	pn = pn.MultiAppendFindTo2(n)
+	pn := primenum.New().MultiAppendFindTo2(n)
 	fmt.Printf("multi2 %v %v %v\n",
 		time.Now().Sub(st),
 		len(pn),
@@ -115,8 +112,7 @@ func multi2(n int) {
 
 func multi3(n int) {
 	st := time.Now()
-	pn := primenum.NewPrimeIntList(8)
-	pn = pn.MultiAppendFindTo3(n)
+	pn := primenum.New().MultiAppendFindTo3(n)
 	fmt.Printf("multi3 %v %v %v\n",
 		time.Now().Sub(st),
 		len(pn),
