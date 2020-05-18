@@ -20,7 +20,25 @@ import (
 
 func main() {
 	// main1()
-	bench()
+	// bench()
+	loadsave()
+}
+
+func loadsave() {
+	filename := "pnff.gob"
+	pn := primenum.NewPrimeIntList(0xff)
+	fmt.Println(pn)
+	err := pn.Save(filename)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	pn2, err := primenum.LoadPrimeIntList(filename)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println(pn2)
 }
 
 func bench() {

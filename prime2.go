@@ -12,7 +12,10 @@
 package primenum
 
 import (
+	"encoding/gob"
+	"fmt"
 	"math"
+	"os"
 	"runtime"
 	"sort"
 	"sync"
@@ -128,4 +131,33 @@ func (pn PrimeIntList) MultiAppendFindTo(n int) PrimeIntList {
 
 	sort.Ints(pn[lastIndex+1:])
 	return pn
+}
+
+func (pn PrimeIntList) Save(filename string) error {
+	fd, err := os.Create(filename)
+	if err != nil {
+		return fmt.Errorf("err in create %v", err)
+	}
+	defer fd.Close()
+	enc := gob.NewEncoder(fd)
+	err = enc.Encode(pn)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func LoadPrimeIntList(filename string) (PrimeIntList, error) {
+	fd, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("Fail to %v", err)
+	}
+	defer fd.Close()
+	var rtn PrimeIntList
+	dec := gob.NewDecoder(fd)
+	err = dec.Decode(&rtn)
+	if err != nil {
+		return nil, err
+	}
+	return rtn, nil
 }
