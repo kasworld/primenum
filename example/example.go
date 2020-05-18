@@ -19,62 +19,50 @@ import (
 )
 
 func main() {
+	main1()
+}
+
+func main1() {
+	// for i := int(8); i < 0xff; i <<= 1 {
+	for i := int(8); i < 0xffffffffffff; i <<= 1 {
+		find1(int64(i))
+		find2(i)
+		find3(i)
+		fmt.Println()
+	}
+}
+
+func find1(n int64) {
+	st := time.Now()
+	pn := primenum.MakePrimes(n)
+	fmt.Printf("simple %v %v %v\n",
+		time.Now().Sub(st),
+		len(pn),
+		pn[len(pn)-1],
+	)
+	// fmt.Println(pn)
+}
+
+func find2(n int) {
+	st := time.Now()
 	pn := primenum.NewPrimeIntList(8)
-	for i := int(8); i < 0xffffffffffff; i <<= 1 {
-		find2(&pn, i)
-	}
-}
-
-func main2() {
-	for i := int(8); i < 0xffffffffffff; i <<= 1 {
-		find(int64(i))
-	}
-}
-
-func find2(pn *primenum.PrimeIntList, n int) {
-	st := time.Now()
-	pn.MultiAppendFindTo(n)
-	// pn.AppendFindTo(n)
-	fmt.Printf("%v %v %v\n",
+	pn = pn.AppendFindTo(n)
+	fmt.Printf("single %v %v %v\n",
 		time.Now().Sub(st),
-		len(*pn),
-		(*pn)[len(*pn)-1],
+		len(pn),
+		(pn)[len(pn)-1],
 	)
+	// fmt.Println(pn)
 }
 
-func find(n int64) {
+func find3(n int) {
 	st := time.Now()
-	primes := primenum.MakePrimes(n)
-	fmt.Printf("%v %v %v\n",
+	pn := primenum.NewPrimeIntList(8)
+	pn = pn.MultiAppendFindTo(n)
+	fmt.Printf("multi %v %v %v\n",
 		time.Now().Sub(st),
-		len(primes),
-		primes[len(primes)-1],
+		len(pn),
+		(pn)[len(pn)-1],
 	)
+	// fmt.Println(pn)
 }
-
-/* test data
-1.69µs 4 7
-880ns 6 13
-1.07µs 11 31
-3.07µs 18 61
-5.5µs 31 127
-11.18µs 54 251
-10.72µs 97 509
-24.84µs 172 1021
-53.52µs 309 2039
-124.25µs 564 4093
-296.99µs 1028 8191
-684.909µs 1900 16381
-1.62772ms 3512 32749
-3.868778ms 6542 65521
-6.936947ms 12251 131071
-11.301715ms 23000 262139
-27.615097ms 43390 524287
-68.094249ms 82025 1048573
-168.868742ms 155611 2097143
-428.764485ms 295947 4194301
-1.068120231s 564163 8388593
-2.71166386s 1077871 16777213
-6.908527526s 2063689 33554393
-
-*/

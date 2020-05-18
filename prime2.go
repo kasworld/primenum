@@ -20,6 +20,25 @@ import (
 
 type PrimeIntList []int
 
+func NewPrimeIntList(n int) PrimeIntList {
+	pn := PrimeIntList{2, 3}
+	pn = pn.AppendFindTo(n)
+	return pn
+}
+
+func (pn PrimeIntList) AppendFindTo(n int) PrimeIntList {
+	last := pn[len(pn)-1]
+	if last >= n {
+		return pn
+	}
+	for i := last + 2; i <= n; i += 2 {
+		if pn.CalcPrime(i) {
+			pn = append(pn, i)
+		}
+	}
+	return pn
+}
+
 func (pn PrimeIntList) FindPos(n int) (int, bool) {
 	i := sort.SearchInts(pn, n)
 	if i < len(pn) && pn[i] == n {
@@ -31,12 +50,6 @@ func (pn PrimeIntList) FindPos(n int) (int, bool) {
 		return i, false
 	}
 }
-
-// func (pn PrimeIntList) Sort() {
-// 	if !sort.IntsAreSorted(pn) {
-// 		sort.Ints(pn)
-// 	}
-// }
 
 func (pn PrimeIntList) MaxCanCheck() int {
 	last := pn[len(pn)-1]
@@ -60,36 +73,17 @@ func (pn PrimeIntList) CalcPrime(n int) bool {
 	return true
 }
 
-func (pn *PrimeIntList) AppendFindTo(n int) {
-	last := (*pn)[len(*pn)-1]
+func (pn PrimeIntList) MultiAppendFindTo(n int) PrimeIntList {
+	lastIndex := len(pn) - 1
+	last := pn[lastIndex]
 	if last >= n {
-		return
+		return pn
 	}
-	if pn.MaxCanCheck() < n {
-		pn.AppendFindTo(n / 2)
-	}
-	for i := last + 2; i < n; i += 2 {
-		if pn.CalcPrime(i) {
-			*pn = append(*pn, i)
-		}
-	}
-}
 
-func NewPrimeIntList(n int) PrimeIntList {
-	pn := make(PrimeIntList, 0, n/10)
-	pn = append(pn, []int{2, 3}...)
-	pn.AppendFindTo(n)
-	return pn
-}
-
-func (pn *PrimeIntList) MultiAppendFindTo(n int) {
-	lastIndex := len(*pn) - 1
-	last := (*pn)[lastIndex]
-	if last >= n {
-		return
-	}
-	if pn.MaxCanCheck() < n {
-		pn.AppendFindTo(n / 2)
+	if n >= last*last {
+		pn = pn.MultiAppendFindTo(n / 2)
+		lastIndex = len(pn) - 1
+		last = pn[lastIndex]
 	}
 
 	bufl := runtime.NumCPU() * 1
@@ -102,7 +96,7 @@ func (pn *PrimeIntList) MultiAppendFindTo(n int) {
 	wgAppend.Add(1)
 	go func() {
 		for n := range appendCh {
-			*pn = append(*pn, n)
+			pn = append(pn, n)
 		}
 		wgAppend.Done()
 	}()
@@ -110,7 +104,7 @@ func (pn *PrimeIntList) MultiAppendFindTo(n int) {
 	// prepare need check data
 	argCh := make(chan int, bufl*1000)
 	go func() {
-		for i := last + 2; i < n; i += 2 {
+		for i := last + 2; i <= n; i += 2 {
 			argCh <- i
 		}
 		close(argCh)
@@ -132,5 +126,6 @@ func (pn *PrimeIntList) MultiAppendFindTo(n int) {
 	close(appendCh)
 	wgAppend.Wait()
 
-	sort.Ints((*pn)[lastIndex+1:])
+	sort.Ints(pn[lastIndex+1:])
+	return pn
 }
