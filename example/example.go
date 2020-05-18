@@ -20,7 +20,7 @@ import (
 
 func main() {
 	pn := primenum.NewPrimeIntList(8)
-	for i := int(8); i < 0xffffffff; i <<= 1 {
+	for i := int(8); i < 0xffffffffffff; i <<= 1 {
 		find2(&pn, i)
 	}
 }

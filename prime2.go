@@ -32,11 +32,11 @@ func (pn PrimeIntList) FindPos(n int) (int, bool) {
 	}
 }
 
-func (pn PrimeIntList) Sort() {
-	if !sort.IntsAreSorted(pn) {
-		sort.Ints(pn)
-	}
-}
+// func (pn PrimeIntList) Sort() {
+// 	if !sort.IntsAreSorted(pn) {
+// 		sort.Ints(pn)
+// 	}
+// }
 
 func (pn PrimeIntList) MaxCanCheck() int {
 	last := pn[len(pn)-1]
@@ -83,7 +83,8 @@ func NewPrimeIntList(n int) PrimeIntList {
 }
 
 func (pn *PrimeIntList) MultiAppendFindTo(n int) {
-	last := (*pn)[len(*pn)-1]
+	lastIndex := len(*pn) - 1
+	last := (*pn)[lastIndex]
 	if last >= n {
 		return
 	}
@@ -129,5 +130,5 @@ func (pn *PrimeIntList) MultiAppendFindTo(n int) {
 
 	close(appendCh)
 	close(argCh)
-	pn.Sort()
+	sort.Ints((*pn)[lastIndex+1:])
 }
