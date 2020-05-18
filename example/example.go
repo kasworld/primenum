@@ -19,9 +19,9 @@ import (
 )
 
 func main() {
-	// main1()
-	// bench()
-	loadsave()
+	bench1()
+	// bench2()
+	// loadsave()
 }
 
 func loadsave() {
@@ -41,7 +41,7 @@ func loadsave() {
 	fmt.Println(pn2)
 }
 
-func bench() {
+func bench2() {
 	pn := primenum.NewPrimeIntList(8)
 	for i := int(8); i < 0xffffffffffff; i <<= 1 {
 		st := time.Now()
@@ -54,12 +54,13 @@ func bench() {
 	}
 }
 
-func main1() {
+func bench1() {
 	// for i := int(8); i < 0xff; i <<= 1 {
 	for i := int(8); i < 0xffffffffffff; i <<= 1 {
-		find1(int64(i))
+		// find1(int64(i))
 		find2(i)
 		find3(i)
+		find4(i)
 		fmt.Println()
 	}
 }
@@ -92,6 +93,18 @@ func find3(n int) {
 	pn := primenum.NewPrimeIntList(8)
 	pn = pn.MultiAppendFindTo(n)
 	fmt.Printf("multi %v %v %v\n",
+		time.Now().Sub(st),
+		len(pn),
+		(pn)[len(pn)-1],
+	)
+	// fmt.Println(pn)
+}
+
+func find4(n int) {
+	st := time.Now()
+	pn := primenum.NewPrimeIntList(8)
+	pn = pn.MultiAppendFindTo2(n)
+	fmt.Printf("multi2 %v %v %v\n",
 		time.Now().Sub(st),
 		len(pn),
 		(pn)[len(pn)-1],

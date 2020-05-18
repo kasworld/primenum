@@ -133,6 +133,54 @@ func (pn PrimeIntList) MultiAppendFindTo(n int) PrimeIntList {
 	return pn
 }
 
+func (pn PrimeIntList) MultiAppendFindTo2(n int) PrimeIntList {
+	lastIndex := len(pn) - 1
+	last := pn[lastIndex]
+	if last >= n {
+		return pn
+	}
+
+	if n >= last*last {
+		pn = pn.MultiAppendFindTo2(n / 2)
+		lastIndex = len(pn) - 1
+		last = pn[lastIndex]
+	}
+
+	workerCount := runtime.NumCPU() * 1
+
+	var wgWorker sync.WaitGroup
+	var wgAppend sync.WaitGroup
+
+	// recv result
+	appendCh := make(chan int, workerCount*2)
+	wgAppend.Add(1)
+	go func() {
+		for n := range appendCh {
+			pn = append(pn, n)
+		}
+		wgAppend.Done()
+	}()
+
+	// run worker
+	for workerid := 0; workerid < workerCount; workerid++ {
+		wgWorker.Add(1)
+		go func(workerid int) {
+			for i := last + 2 + workerid*2; i <= n; i += workerCount * 2 {
+				if pn.CalcPrime(i) {
+					appendCh <- i
+				}
+			}
+			wgWorker.Done()
+		}(workerid)
+	}
+	wgWorker.Wait()
+	close(appendCh)
+	wgAppend.Wait()
+
+	sort.Ints(pn[lastIndex+1:])
+	return pn
+}
+
 func (pn PrimeIntList) Save(filename string) error {
 	fd, err := os.Create(filename)
 	if err != nil {
