@@ -97,7 +97,7 @@ func (pn *PrimeIntList) MultiAppendFindTo(n int) {
 	var wgWorker sync.WaitGroup
 
 	// recv result
-	appendCh := make(chan int, bufl)
+	appendCh := make(chan int, bufl*100)
 	go func() {
 		for n := range appendCh {
 			*pn = append(*pn, n)
@@ -105,7 +105,7 @@ func (pn *PrimeIntList) MultiAppendFindTo(n int) {
 	}()
 
 	// prepare need check data
-	argCh := make(chan int, bufl)
+	argCh := make(chan int, bufl*1000)
 	go func() {
 		for i := last + 2; i < n; i += 2 {
 			argCh <- i
