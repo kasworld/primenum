@@ -19,35 +19,19 @@ import (
 )
 
 func main() {
-	bench1()
-	// bench2()
+	// bench1()
+	bench2()
 	// loadsave()
-}
-
-func loadsave() {
-	filename := "pnff.gob"
-	pn := primenum.New().AppendFindTo(0xff)
-	fmt.Println(pn)
-	err := pn.Save(filename)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	pn2, err := primenum.LoadPrimeIntList(filename)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	fmt.Println(pn2)
 }
 
 func bench2() {
 	pn := primenum.New()
 	for i := int(8); i < 0xffffffffffff; i <<= 1 {
 		st := time.Now()
-		pn = pn.MultiAppendFindTo3(i)
-		fmt.Printf("multi %v %v %v\n",
-			time.Now().Sub(st),
+		pn = pn.MultiAppendFindTo4(i)
+		ed := time.Now()
+		fmt.Printf("%v %v %v %v\n",
+			ed.Format("2006-01-02 15:04:05"), ed.Sub(st),
 			len(pn),
 			(pn)[len(pn)-1],
 		)
@@ -143,4 +127,21 @@ func multi4(n int) {
 		(pn)[len(pn)-1],
 	)
 	// fmt.Println(pn)
+}
+
+func loadsave() {
+	filename := "pnff.gob"
+	pn := primenum.New().AppendFindTo(0xff)
+	fmt.Println(pn)
+	err := pn.Save(filename)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	pn2, err := primenum.LoadPrimeIntList(filename)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println(pn2)
 }
