@@ -19,8 +19,8 @@ import (
 )
 
 func main() {
-	// bench1()
-	bench2()
+	bench1()
+	// bench2()
 	// loadsave()
 }
 
@@ -58,10 +58,12 @@ func bench1() {
 	// for i := int(8); i < 0xff; i <<= 1 {
 	for i := int(8); i < 0xffffffffffff; i <<= 1 {
 		// simple(int64(i))
-		single(i)
+		// single(i)
+		// singleCap(i)
 		// multi(i)
-		multi2(i)
+		// multi2(i)
 		multi3(i)
+		multi4(i)
 		fmt.Println()
 	}
 }
@@ -81,6 +83,17 @@ func single(n int) {
 	st := time.Now()
 	pn := primenum.New().AppendFindTo(n)
 	fmt.Printf("single %v %v %v\n",
+		time.Now().Sub(st),
+		len(pn),
+		(pn)[len(pn)-1],
+	)
+	// fmt.Println(pn)
+}
+
+func singleCap(n int) {
+	st := time.Now()
+	pn := primenum.NewWithCap(n / 16).AppendFindTo(n)
+	fmt.Printf("singleCap %v %v %v\n",
 		time.Now().Sub(st),
 		len(pn),
 		(pn)[len(pn)-1],
@@ -114,6 +127,17 @@ func multi3(n int) {
 	st := time.Now()
 	pn := primenum.New().MultiAppendFindTo3(n)
 	fmt.Printf("multi3 %v %v %v\n",
+		time.Now().Sub(st),
+		len(pn),
+		(pn)[len(pn)-1],
+	)
+	// fmt.Println(pn)
+}
+
+func multi4(n int) {
+	st := time.Now()
+	pn := primenum.NewWithCap(n / 16).MultiAppendFindTo4(n)
+	fmt.Printf("multi4 %v %v %v\n",
 		time.Now().Sub(st),
 		len(pn),
 		(pn)[len(pn)-1],

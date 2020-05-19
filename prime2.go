@@ -28,6 +28,12 @@ func New() PrimeIntList {
 	return pn
 }
 
+func NewWithCap(n int) PrimeIntList {
+	pn := make(PrimeIntList, 0, n)
+	pn = append(pn, PrimeIntList{2, 3}...)
+	return pn
+}
+
 func (pn PrimeIntList) AppendFindTo(n int) PrimeIntList {
 	last := pn[len(pn)-1]
 	if last >= n {
@@ -213,6 +219,70 @@ func (pn PrimeIntList) MultiAppendFindTo3(n int) PrimeIntList {
 		}(workerID)
 	}
 	wgWorker.Wait()
+
+	// merge sort
+	workerPos := make([]int, workerCount)
+	for true {
+		minFound := 0
+		minWorkerID := 0
+		for workerID := 0; workerID < workerCount; workerID++ {
+			pos := workerPos[workerID]
+			if pos >= len(workResult[workerID]) {
+				continue
+			}
+			if minFound == 0 || workResult[workerID][pos] < minFound {
+				minFound = workResult[workerID][pos]
+				minWorkerID = workerID
+			}
+		}
+		if minFound != 0 {
+			pn = append(pn, minFound)
+			workerPos[minWorkerID]++
+		} else {
+			break
+		}
+	}
+	return pn
+}
+
+func (pn PrimeIntList) MultiAppendFindTo4(n int) PrimeIntList {
+	lastIndex := len(pn) - 1
+	last := pn[lastIndex]
+	if last >= n {
+		return pn
+	}
+
+	if n >= last*last {
+		pn = pn.MultiAppendFindTo4(n / 2)
+		lastIndex = len(pn) - 1
+		last = pn[lastIndex]
+	}
+
+	workerCount := runtime.NumCPU() * 1
+
+	var wgWorker sync.WaitGroup
+
+	workResult := make([]PrimeIntList, workerCount)
+	workerBufferLen := (n - last) / workerCount / 16
+	// run worker
+	for workerID := 0; workerID < workerCount; workerID++ {
+		wgWorker.Add(1)
+		go func(workerID int) {
+			rtn := make(PrimeIntList, 0, workerBufferLen)
+			for i := last + 2 + workerID*2; i <= n; i += workerCount * 2 {
+				if pn.CalcPrime(i) {
+					rtn = append(rtn, i)
+				}
+			}
+			workResult[workerID] = rtn
+			wgWorker.Done()
+		}(workerID)
+	}
+	wgWorker.Wait()
+
+	// for workerID := 0; workerID < workerCount; workerID++ {
+	// 	fmt.Printf("worker %v buflen %v datalen %v\n", workerID, workerBufferLen, len(workResult[workerID]))
+	// }
 
 	// merge sort
 	workerPos := make([]int, workerCount)
