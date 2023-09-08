@@ -19,8 +19,9 @@ import (
 )
 
 func main() {
+	multi4(10000000)
 	// bench1()
-	bench2()
+	// bench2()
 	// loadsave()
 }
 

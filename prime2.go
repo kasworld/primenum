@@ -34,17 +34,13 @@ func NewWithCap(n int) PrimeIntList {
 	return pn
 }
 
-func (pn PrimeIntList) AppendFindTo(n int) PrimeIntList {
-	last := pn[len(pn)-1]
-	if last >= n {
-		return pn
-	}
-	for i := last + 2; i <= n; i += 2 {
-		if pn.CalcPrime(i) {
-			pn = append(pn, i)
-		}
-	}
-	return pn
+func (pn PrimeIntList) GetLast() int {
+	return pn[len(pn)-1]
+}
+
+func (pn PrimeIntList) MaxCanCheck() int {
+	last := pn.GetLast()
+	return last * last
 }
 
 func (pn PrimeIntList) FindPos(n int) (int, bool) {
@@ -57,11 +53,6 @@ func (pn PrimeIntList) FindPos(n int) (int, bool) {
 		// but i is the index where it would be inserted.
 		return i, false
 	}
-}
-
-func (pn PrimeIntList) MaxCanCheck() int {
-	last := pn[len(pn)-1]
-	return last * last
 }
 
 func (pn PrimeIntList) CanFindIn(n int) bool {
@@ -81,17 +72,30 @@ func (pn PrimeIntList) CalcPrime(n int) bool {
 	return true
 }
 
+func (pn PrimeIntList) AppendFindTo(n int) PrimeIntList {
+	last := pn.GetLast()
+	if last >= n {
+		return pn
+	}
+	for i := last + 2; i <= n; i += 2 {
+		if pn.CalcPrime(i) {
+			pn = append(pn, i)
+		}
+	}
+	return pn
+}
+
 func (pn PrimeIntList) MultiAppendFindTo(n int) PrimeIntList {
-	lastIndex := len(pn) - 1
-	last := pn[lastIndex]
+	oldLen := len(pn)
+	last := pn.GetLast()
 	if last >= n {
 		return pn
 	}
 
-	if n >= last*last {
+	if n >= pn.MaxCanCheck() {
 		pn = pn.MultiAppendFindTo(n / 2)
-		lastIndex = len(pn) - 1
-		last = pn[lastIndex]
+		oldLen = len(pn)
+		last = pn.GetLast()
 	}
 
 	bufl := runtime.NumCPU() * 1
@@ -134,21 +138,21 @@ func (pn PrimeIntList) MultiAppendFindTo(n int) PrimeIntList {
 	close(appendCh)
 	wgAppend.Wait()
 
-	sort.Ints(pn[lastIndex+1:])
+	sort.Ints(pn[oldLen:])
 	return pn
 }
 
 func (pn PrimeIntList) MultiAppendFindTo2(n int) PrimeIntList {
-	lastIndex := len(pn) - 1
-	last := pn[lastIndex]
+	oldLen := len(pn)
+	last := pn.GetLast()
 	if last >= n {
 		return pn
 	}
 
-	if n >= last*last {
+	if n >= pn.MaxCanCheck() {
 		pn = pn.MultiAppendFindTo2(n / 2)
-		lastIndex = len(pn) - 1
-		last = pn[lastIndex]
+		oldLen = len(pn)
+		last = pn.GetLast()
 	}
 
 	workerCount := runtime.NumCPU() * 1
@@ -182,33 +186,31 @@ func (pn PrimeIntList) MultiAppendFindTo2(n int) PrimeIntList {
 	close(appendCh)
 	wgAppend.Wait()
 
-	sort.Ints(pn[lastIndex+1:])
+	sort.Ints(pn[oldLen:])
 	return pn
 }
 
 func (pn PrimeIntList) MultiAppendFindTo3(n int) PrimeIntList {
-	lastIndex := len(pn) - 1
-	last := pn[lastIndex]
+	last := pn.GetLast()
 	if last >= n {
 		return pn
 	}
 
-	if n >= last*last {
+	if n >= pn.MaxCanCheck() {
 		pn = pn.MultiAppendFindTo3(n / 2)
-		lastIndex = len(pn) - 1
-		last = pn[lastIndex]
+		last = pn.GetLast()
 	}
 
 	workerCount := runtime.NumCPU() * 1
 
 	var wgWorker sync.WaitGroup
 
-	workResult := make([]PrimeIntList, workerCount)
+	workResult := make([][]int, workerCount)
 	// run worker
 	for workerID := 0; workerID < workerCount; workerID++ {
 		wgWorker.Add(1)
 		go func(workerID int) {
-			var rtn PrimeIntList
+			var rtn []int
 			for i := last + 2 + workerID*2; i <= n; i += workerCount * 2 {
 				if pn.CalcPrime(i) {
 					rtn = append(rtn, i)
@@ -220,55 +222,31 @@ func (pn PrimeIntList) MultiAppendFindTo3(n int) PrimeIntList {
 	}
 	wgWorker.Wait()
 
-	// merge sort
-	workerPos := make([]int, workerCount)
-	for true {
-		minFound := 0
-		minWorkerID := 0
-		for workerID := 0; workerID < workerCount; workerID++ {
-			pos := workerPos[workerID]
-			if pos >= len(workResult[workerID]) {
-				continue
-			}
-			if minFound == 0 || workResult[workerID][pos] < minFound {
-				minFound = workResult[workerID][pos]
-				minWorkerID = workerID
-			}
-		}
-		if minFound != 0 {
-			pn = append(pn, minFound)
-			workerPos[minWorkerID]++
-		} else {
-			break
-		}
-	}
-	return pn
+	return pn.MergeSort(workResult)
 }
 
 func (pn PrimeIntList) MultiAppendFindTo4(n int) PrimeIntList {
-	lastIndex := len(pn) - 1
-	last := pn[lastIndex]
+	last := pn.GetLast()
 	if last >= n {
 		return pn
 	}
 
-	if n >= last*last {
+	if n >= pn.MaxCanCheck() {
 		pn = pn.MultiAppendFindTo4(n / 2)
-		lastIndex = len(pn) - 1
-		last = pn[lastIndex]
+		last = pn.GetLast()
 	}
 
 	workerCount := runtime.NumCPU() * 1
 
 	var wgWorker sync.WaitGroup
 
-	workResult := make([]PrimeIntList, workerCount)
+	workResult := make([][]int, workerCount)
 	workerBufferLen := (n - last) / workerCount / 16
 	// run worker
 	for workerID := 0; workerID < workerCount; workerID++ {
 		wgWorker.Add(1)
 		go func(workerID int) {
-			rtn := make(PrimeIntList, 0, workerBufferLen)
+			rtn := make([]int, 0, workerBufferLen)
 			for i := last + 2 + workerID*2; i <= n; i += workerCount * 2 {
 				if pn.CalcPrime(i) {
 					rtn = append(rtn, i)
@@ -284,9 +262,14 @@ func (pn PrimeIntList) MultiAppendFindTo4(n int) PrimeIntList {
 	// 	fmt.Printf("worker %v buflen %v datalen %v\n", workerID, workerBufferLen, len(workResult[workerID]))
 	// }
 
-	// merge sort
+	return pn.MergeSort(workResult)
+}
+
+// merge sort
+func (pn PrimeIntList) MergeSort(workResult [][]int) PrimeIntList {
+	workerCount := len(workResult)
 	workerPos := make([]int, workerCount)
-	for true {
+	for {
 		minFound := 0
 		minWorkerID := 0
 		for workerID := 0; workerID < workerCount; workerID++ {
@@ -326,7 +309,7 @@ func (pn PrimeIntList) Save(filename string) error {
 func LoadPrimeIntList(filename string) (PrimeIntList, error) {
 	fd, err := os.Open(filename)
 	if err != nil {
-		return nil, fmt.Errorf("Fail to %v", err)
+		return nil, fmt.Errorf("fail to %v", err)
 	}
 	defer fd.Close()
 	var rtn PrimeIntList
