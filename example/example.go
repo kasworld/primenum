@@ -13,92 +13,62 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/kasworld/primenum"
 )
 
 func main() {
-	multi4(100000000)
-	// bench1()
-	// bench2()
-	// loadsave()
-}
-
-func bench2() {
-	pn := primenum.New()
-	for i := int(8); i < 0xffffffffffff; i <<= 1 {
-		st := time.Now()
-		pn = pn.MultiAppendFindTo4(i)
-		ed := time.Now()
-		fmt.Printf("%v %v %v\n",
-			ed.Format("2006-01-02 15:04:05"), ed.Sub(st),
-			pn,
-		)
+	num := 1000000
+	cmd := "multi4"
+	if len(os.Args) > 1 {
+		v, err := strconv.Atoi(os.Args[1])
+		if err != nil {
+			println(err)
+			help()
+		} else {
+			num = v
+		}
+	}
+	if len(os.Args) > 2 {
+		cmd = os.Args[2]
+	}
+	st := time.Now()
+	fmt.Printf("%v %v\n", cmd, num)
+	switch cmd {
+	case "simple":
+		pn := primenum.MakePrimes(int64(num))
+		fmt.Printf("%v %v\n", time.Since(st), pn)
+	case "single":
+		pn := primenum.New().AppendFindTo(num)
+		fmt.Printf("%v %v\n", time.Since(st), pn)
+	case "single2":
+		pn := primenum.NewWithCap(num / 16).AppendFindTo(num)
+		fmt.Printf("%v %v\n", time.Since(st), pn)
+	case "multi1":
+		pn := primenum.New().MultiAppendFindTo(num)
+		fmt.Printf("%v %v\n", time.Since(st), pn)
+	case "multi2":
+		pn := primenum.New().MultiAppendFindTo2(num)
+		fmt.Printf("%v %v\n", time.Since(st), pn)
+	case "multi3":
+		pn := primenum.New().MultiAppendFindTo3(num)
+		fmt.Printf("%v %v\n", time.Since(st), pn)
+	case "multi4":
+		pn := primenum.NewWithCap(num / 16).MultiAppendFindTo4(num)
+		fmt.Printf("%v %v\n", time.Since(st), pn)
+	default:
+		help()
 	}
 }
 
-func bench1() {
-	// for i := int(8); i < 0xff; i <<= 1 {
-	for i := int(8); i < 0xffffffffffff; i <<= 1 {
-		// simple(int64(i))
-		// single(i)
-		// singleCap(i)
-		// multi(i)
-		// multi2(i)
-		multi3(i)
-		multi4(i)
-		fmt.Println()
-	}
-}
-
-func simple(n int64) {
-	st := time.Now()
-	pn := primenum.MakePrimes(n)
-	fmt.Printf("simple %v %v\n", time.Now().Sub(st), pn)
-	// fmt.Println(pn)
-}
-
-func single(n int) {
-	st := time.Now()
-	pn := primenum.New().AppendFindTo(n)
-	fmt.Printf("single %v %v\n", time.Now().Sub(st), pn)
-	// fmt.Println(pn)
-}
-
-func singleCap(n int) {
-	st := time.Now()
-	pn := primenum.NewWithCap(n / 16).AppendFindTo(n)
-	fmt.Printf("singleCap %v %v\n", time.Now().Sub(st), pn)
-	// fmt.Println(pn)
-}
-
-func multi(n int) {
-	st := time.Now()
-	pn := primenum.New().MultiAppendFindTo(n)
-	fmt.Printf("multi %v %v\n", time.Now().Sub(st), pn)
-	// fmt.Println(pn)
-}
-
-func multi2(n int) {
-	st := time.Now()
-	pn := primenum.New().MultiAppendFindTo2(n)
-	fmt.Printf("multi2 %v %v\n", time.Now().Sub(st), pn)
-	// fmt.Println(pn)
-}
-
-func multi3(n int) {
-	st := time.Now()
-	pn := primenum.New().MultiAppendFindTo3(n)
-	fmt.Printf("multi3 %v %v\n", time.Now().Sub(st), pn)
-	// fmt.Println(pn)
-}
-
-func multi4(n int) {
-	st := time.Now()
-	pn := primenum.NewWithCap(n / 16).MultiAppendFindTo4(n)
-	fmt.Printf("multi4 %v %v\n", time.Now().Sub(st), pn)
-	// fmt.Println(pn)
+func help() {
+	fmt.Printf("%v num cmd\n", os.Args[0])
+	println("num : prime calc upto num")
+	println("cmd : multi1 ~ multi4 : multi thread calc")
+	println("cmd : simple single single2 : single thread calc")
 }
 
 func loadsave() {
