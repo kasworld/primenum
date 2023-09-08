@@ -21,7 +21,7 @@ import (
 )
 
 func main() {
-	num := 1000000
+	num := primenum.Element(1000000)
 	cmd := "multi4"
 	if len(os.Args) > 1 {
 		v, err := strconv.Atoi(os.Args[1])
@@ -29,7 +29,7 @@ func main() {
 			println(err)
 			help()
 		} else {
-			num = v
+			num = primenum.Element(v)
 		}
 	}
 	if len(os.Args) > 2 {
@@ -38,14 +38,11 @@ func main() {
 	st := time.Now()
 	fmt.Printf("%v %v\n", cmd, num)
 	switch cmd {
-	case "simple":
-		pn := primenum.MakePrimes(int64(num))
-		fmt.Printf("%v %v\n", time.Since(st), pn)
 	case "single":
 		pn := primenum.New().AppendFindTo(num)
 		fmt.Printf("%v %v\n", time.Since(st), pn)
 	case "single2":
-		pn := primenum.NewWithCap(num / 16).AppendFindTo(num)
+		pn := primenum.NewWithCap(int(num) / 16).AppendFindTo(num)
 		fmt.Printf("%v %v\n", time.Since(st), pn)
 	case "multi1":
 		pn := primenum.New().MultiAppendFindTo(num)
@@ -57,7 +54,7 @@ func main() {
 		pn := primenum.New().MultiAppendFindTo3(num)
 		fmt.Printf("%v %v\n", time.Since(st), pn)
 	case "multi4":
-		pn := primenum.NewWithCap(num / 16).MultiAppendFindTo4(num)
+		pn := primenum.NewWithCap(int(num) / 16).MultiAppendFindTo4(num)
 		fmt.Printf("%v %v\n", time.Since(st), pn)
 	default:
 		help()
@@ -68,7 +65,7 @@ func help() {
 	fmt.Printf("%v num cmd\n", os.Args[0])
 	println("num : prime calc upto num")
 	println("cmd : multi1 ~ multi4 : multi thread calc")
-	println("cmd : simple single single2 : single thread calc")
+	println("cmd : single single2 : single thread calc")
 }
 
 func loadsave() {
