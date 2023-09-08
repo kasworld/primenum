@@ -185,21 +185,17 @@ func (pn PrimeIntList) MultiAppendFindTo2(n Element) PrimeIntList {
 }
 
 func (pn PrimeIntList) MultiAppendFindTo3(n Element) PrimeIntList {
-	last := pn.GetLast()
-	if last >= n {
+	if pn.GetLast() >= n {
 		return pn
 	}
-
 	if n >= pn.MaxCanCheck() {
 		pn = pn.MultiAppendFindTo3(n / 2)
-		last = pn.GetLast()
 	}
 
 	workerCount := runtime.NumCPU() * 1
-
 	var wgWorker sync.WaitGroup
-
 	workResult := make([][]Element, workerCount)
+	last := pn.GetLast()
 	// run worker
 	for workerID := 0; workerID < workerCount; workerID++ {
 		wgWorker.Add(1)
@@ -220,21 +216,17 @@ func (pn PrimeIntList) MultiAppendFindTo3(n Element) PrimeIntList {
 }
 
 func (pn PrimeIntList) MultiAppendFindTo4(n Element) PrimeIntList {
-	last := pn.GetLast()
-	if last >= n {
+	if pn.GetLast() >= n {
 		return pn
 	}
-
 	if n >= pn.MaxCanCheck() {
 		pn = pn.MultiAppendFindTo4(n / 2)
-		last = pn.GetLast()
 	}
 
 	workerCount := runtime.NumCPU() * 1
-
 	var wgWorker sync.WaitGroup
-
 	workResult := make([][]Element, workerCount)
+	last := pn.GetLast()
 	workerBufferLen := int(n-last) / workerCount / 16
 	// run worker
 	for workerID := 0; workerID < workerCount; workerID++ {
