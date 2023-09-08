@@ -19,7 +19,7 @@ import (
 )
 
 func main() {
-	multi4(10000000)
+	multi4(100000000)
 	// bench1()
 	// bench2()
 	// loadsave()
@@ -31,10 +31,9 @@ func bench2() {
 		st := time.Now()
 		pn = pn.MultiAppendFindTo4(i)
 		ed := time.Now()
-		fmt.Printf("%v %v %v %v\n",
+		fmt.Printf("%v %v %v\n",
 			ed.Format("2006-01-02 15:04:05"), ed.Sub(st),
-			len(pn),
-			(pn)[len(pn)-1],
+			pn,
 		)
 	}
 }
@@ -56,77 +55,49 @@ func bench1() {
 func simple(n int64) {
 	st := time.Now()
 	pn := primenum.MakePrimes(n)
-	fmt.Printf("simple %v %v %v\n",
-		time.Now().Sub(st),
-		len(pn),
-		pn[len(pn)-1],
-	)
+	fmt.Printf("simple %v %v\n", time.Now().Sub(st), pn)
 	// fmt.Println(pn)
 }
 
 func single(n int) {
 	st := time.Now()
 	pn := primenum.New().AppendFindTo(n)
-	fmt.Printf("single %v %v %v\n",
-		time.Now().Sub(st),
-		len(pn),
-		(pn)[len(pn)-1],
-	)
+	fmt.Printf("single %v %v\n", time.Now().Sub(st), pn)
 	// fmt.Println(pn)
 }
 
 func singleCap(n int) {
 	st := time.Now()
 	pn := primenum.NewWithCap(n / 16).AppendFindTo(n)
-	fmt.Printf("singleCap %v %v %v\n",
-		time.Now().Sub(st),
-		len(pn),
-		(pn)[len(pn)-1],
-	)
+	fmt.Printf("singleCap %v %v\n", time.Now().Sub(st), pn)
 	// fmt.Println(pn)
 }
 
 func multi(n int) {
 	st := time.Now()
 	pn := primenum.New().MultiAppendFindTo(n)
-	fmt.Printf("multi %v %v %v\n",
-		time.Now().Sub(st),
-		len(pn),
-		(pn)[len(pn)-1],
-	)
+	fmt.Printf("multi %v %v\n", time.Now().Sub(st), pn)
 	// fmt.Println(pn)
 }
 
 func multi2(n int) {
 	st := time.Now()
 	pn := primenum.New().MultiAppendFindTo2(n)
-	fmt.Printf("multi2 %v %v %v\n",
-		time.Now().Sub(st),
-		len(pn),
-		(pn)[len(pn)-1],
-	)
+	fmt.Printf("multi2 %v %v\n", time.Now().Sub(st), pn)
 	// fmt.Println(pn)
 }
 
 func multi3(n int) {
 	st := time.Now()
 	pn := primenum.New().MultiAppendFindTo3(n)
-	fmt.Printf("multi3 %v %v %v\n",
-		time.Now().Sub(st),
-		len(pn),
-		(pn)[len(pn)-1],
-	)
+	fmt.Printf("multi3 %v %v\n", time.Now().Sub(st), pn)
 	// fmt.Println(pn)
 }
 
 func multi4(n int) {
 	st := time.Now()
 	pn := primenum.NewWithCap(n / 16).MultiAppendFindTo4(n)
-	fmt.Printf("multi4 %v %v %v\n",
-		time.Now().Sub(st),
-		len(pn),
-		(pn)[len(pn)-1],
-	)
+	fmt.Printf("multi4 %v %v\n", time.Now().Sub(st), pn)
 	// fmt.Println(pn)
 }
 

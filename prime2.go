@@ -34,6 +34,10 @@ func NewWithCap(n int) PrimeIntList {
 	return pn
 }
 
+func (pn PrimeIntList) String() string {
+	return fmt.Sprintf("%v %v", len(pn), pn.GetLast())
+}
+
 func (pn PrimeIntList) GetLast() int {
 	return pn[len(pn)-1]
 }
@@ -257,10 +261,6 @@ func (pn PrimeIntList) MultiAppendFindTo4(n int) PrimeIntList {
 		}(workerID)
 	}
 	wgWorker.Wait()
-
-	// for workerID := 0; workerID < workerCount; workerID++ {
-	// 	fmt.Printf("worker %v buflen %v datalen %v\n", workerID, workerBufferLen, len(workResult[workerID]))
-	// }
 
 	return pn.MergeSort(workResult)
 }
