@@ -53,7 +53,7 @@ func (pn PrimeIntList) IsPrime(n Element) bool {
 	to := Element(math.Sqrt(float64(n)))
 	for _, v := range pn {
 		if v > to {
-			break
+			return true
 		}
 		if n%v == 0 {
 			return false
