@@ -21,7 +21,7 @@ import (
 	"sync"
 )
 
-type Element int
+type Element uint64
 
 type PrimeIntList []Element
 

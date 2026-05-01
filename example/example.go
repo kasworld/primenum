@@ -21,7 +21,7 @@ import (
 )
 
 func main() {
-	num := primenum.Element(1000000)
+	num := primenum.Element(1000000000)
 	cmd := "multi4"
 	if len(os.Args) > 1 {
 		v, err := strconv.Atoi(os.Args[1])
